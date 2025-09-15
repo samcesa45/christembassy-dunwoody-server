@@ -2,12 +2,17 @@ services:
   - type: web
     name: christembassy-dunwoody-server
     env: node
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
+    buildCommand: npm install && npm run build && npx prisma generate && npx prisma migrate deploy
+    startCommand: npm run start:prod
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: dunwoodchurchdb
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: christembassy-redis
+          type: redis
           property: connectionString
       - key: NODE_ENV
         value: production
@@ -18,5 +23,11 @@ services:
 
 databases:
   - name: dunwoodchurchdb
-    databaseName: christembassy
+    databaseName: dunwoodchurchdb
+    plan: free
+
+services:
+  - type: redis
+    name: christembassy-redis
+    ipAllowList: [] # empty = only your Render services can connect
     plan: free
