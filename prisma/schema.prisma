@@ -1,0 +1,85 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url = env("DATABASE_URL")
+}
+
+model Donor {
+    id              Int             @id @default(autoincrement())
+    uuid            String          @unique @default(uuid())
+    name            String          
+    email           String          @unique
+    phone           String          
+    createdAt       DateTime        @default(now())
+    donations       Donation[]
+}
+
+model Category {
+    id              Int             @id @default(autoincrement())
+    slug            String          @unique 
+    name            String 
+    createdAt       DateTime        @default(now())
+    donations       Donation[]
+}
+
+model Currency {
+    id              Int             @id @default(autoincrement())
+    code            String          @unique
+    symbol          String          
+    name            String         
+    createdAt       DateTime        @default(now())
+    donations       Donation[]
+}
+
+model Donation {
+    id                  Int                     @id @default(autoincrement())
+    uuid                String                  @unique @default(uuid())
+    donorId             Int 
+    donor               Donor                   @relation(fields: [donorId], references: [id])
+    categoryId          Int? 
+    category            Category?               @relation(fields: [categoryId], references: [id])  
+    currencyId          Int             
+    currency            Currency                @relation(fields: [currencyId], references: [id])
+    amount              Int             
+    reference           String                  @unique
+    authorizationUrl    String?
+    status              DonationStatus          @default(PENDING)
+    metadata            Json?
+    createdAt           DateTime                @default(now())
+    updatedAt           DateTime                @updatedAt
+    transactions        PaymentTransaction[]   
+}
+
+model MailLog {
+  id                    String                  @id @default(cuid())
+  reference             String
+  type                  String                  // e.g. "DONATION_SUCCESS"
+  createdAt             DateTime                @default(now())
+}
+
+model PaymentTransaction {
+    id                  Int                     @id @default(autoincrement())
+    donationId          Int                     
+    donation            Donation                @relation(fields: [donationId], references: [id])
+    provider            String 
+    providerRef         String 
+    providerTxnId       String
+    gatewayResponse     String
+    amount              Int
+    status              String
+    rawResponse         Json    
+    createdAt           DateTime                @default(now())
+}
+
+
+
+
+enum DonationStatus {
+    PENDING
+    SUCCESS
+    FAILED
+    CANCELLED
+}

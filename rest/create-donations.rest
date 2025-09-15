@@ -1,0 +1,11 @@
+### Create a donation
+POST http://localhost:4000/donations/initiate
+Content-Type:  application/json
+
+{
+    "name": "John Doe",
+    "email":"john@example.com",
+    "amount":5000,
+    "currency":"NGN",
+    "categoryId":1
+}
