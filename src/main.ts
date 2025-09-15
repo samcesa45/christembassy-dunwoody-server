@@ -17,7 +17,7 @@ async function bootstrap() {
       limit: '1mb'
     })
   )
-  const port = process.env.PORT ?? 3000
+  const port = process.env.PORT ?? 4000
   await app.listen(port);
   console.log(`Server listening on ${port}`);
 
